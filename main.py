@@ -1,1 +1,1 @@
-from gameLogic.py import *
+from gameLogic import *
