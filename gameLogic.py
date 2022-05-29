@@ -1,16 +1,38 @@
 import random
 import json
+from collections import Counter 
 
-def randomly_assign_roles(lobby, roles):
+def randomly_assign_roles(lobby):
+
+    # calculating ratio of mafias and civils
+    r_mafia = 1 # ratio of mafia
+    r_civilian = 4 # ratio of civilians
+    part = len(lobby) / (r_mafia + r_civilian) # ratio formular
+
+    # TOTAL ROLES
+    t_detective = 0
+    t_doctor = 0
+    t_mafia = round(part * r_mafia)
+    t_civilian = round(part * r_civilian) - (t_doctor + t_detective) 
+    roles = ['mafia'] * t_mafia + ['civilians'] * t_civilian + ['detective'] * t_detective + ['doctor'] * t_doctor
+    print(roles)
+
+    # CREATE PLAYERS DICTIONARY
     players = { player : '' for player in lobby}
-
     for player in lobby:
         player_role = random.choice(roles)
         players[player] = player_role
         roles.remove(player_role)
+
+    #<------------------------------
+    mafias = ', '.join([player for player, role in players.items() if role == 'mafia'])
+    civilians = ', '.join([player for player, role in players.items() if role != 'mafia'])
+    print(f'{"-"*80}\nMAFIAS:\u0009{mafias}\nCIVILS:\u0009{civilians}\n{"-"*80}')
+    #------------------------------>
+
     return players
 
-def night_time(players, previously_saved = 0):
+def night_time(players, previously_saved):
     mafias = {player: role for player, role in players.items() if role == 'mafia'}
     civilians = {player: role for player, role in players.items() if role != 'mafia'}
     mafias_vote = {}
@@ -108,7 +130,7 @@ def day_time(players, victim, saved):
                 players_vote[player] = 1 if player not in players_vote else players_vote[player] + 1
     
 
-    # FIND THEMOST VOTED PLAYER
+    # FIND THE MOST VOTED PLAYER
     highest_number = 0
     most_voted = []
     for name in players_vote:
@@ -121,6 +143,7 @@ def day_time(players, victim, saved):
             most_voted.clear()
             most_voted.append(name)
 
+    # REMOVE VOTED PLAYER OUT THE GAME
     if len(most_voted) == 1:
         print(f'\n{"-"*80}\nplayers votes: {players_vote}\n{most_voted[0]} was voted out\n{"-"*80}\n')
         del players[most_voted[0]]  
@@ -129,42 +152,41 @@ def day_time(players, victim, saved):
    
     
     # check if mafias are in the game 
+    return players
     print(f'\n{"-"*80}')
     print(players)
     print(f'Mafias are still in the game\n{"-"*80}\n')
 
 
-
-
-
     
 #<------------------------------
 '''Avoid players with the same name'''
-lobby = ['alex1', 'matt2', 'rei3', 'virgil4', 'raf5','martin6'] 
-#------------------------------>
-
-# calculating ratio of mafias and civils
-r_mafia = 1 # ratio of mafia
-r_civilian = 4 # ratio of civilians
-part = len(lobby) / (r_mafia + r_civilian) # ratio formular
-
-# TOTAL ROLES
-t_detective = 0
-t_doctor = 0
-t_mafia = round(part * r_mafia)
-t_civilian = round(part * r_civilian) - (t_doctor + t_detective) 
-roles = ['mafia'] * t_mafia + ['civilians'] * t_civilian + ['detective'] * t_detective + ['doctor'] * t_doctor
-
-
-
-players = randomly_assign_roles(lobby, roles)
-#<------------------------------
-mafias = ', '.join([player for player, role in players.items() if role == 'mafia'])
-civilians = ', '.join([player for player, role in players.items() if role != 'mafia'])
-print(f'{"-"*80}\nMAFIAS:\u0009{mafias}\nCIVILS:\u0009{civilians}\n{"-"*80}')
+lobby = ['alex1', 'matt2', 'rei3', 'virgil4', 'raf5','martin6']
 #------------------------------>
 
 
-victim, saved = night_time(players)
 
-day_time(players, victim , saved)
+players = randomly_assign_roles(lobby)
+saved = ''
+
+mafia_won = False
+civilian_won = False
+
+while not mafia_won or civilian_won:
+    victim, saved = night_time(players, saved)
+
+    players = day_time(players, victim , saved)
+
+    # counts how many mafias, civilians, doctors, and detectives are left
+    role_counter = Counter(players.values())
+    num_mafia = role_counter['mafia']
+    num_civilians = round(len(players)/2)
+
+    if 'mafia' not in players.values():
+        civilian_won = True
+        print('CIVILIANS WON')
+
+    # check if number of mafia == (round(number of all/2))
+    if num_mafia >= num_civilians:
+        mafia_won = True
+        print('MAFIA WON')
