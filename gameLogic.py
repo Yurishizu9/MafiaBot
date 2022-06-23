@@ -53,7 +53,8 @@ def night_time(players, previously_saved):
             # ADD VICTIM TO LIST
             for player in civilians:
                 if vote == player:
-                    mafias_vote[player] = 1 if vote not in mafias_vote else mafias_vote[player] + 1
+                    mafias_vote[player] = mafias_vote.get(vote, 0) + 1
+
 
             # FIND VICTIM WITH THE HIGHEST VOTE
             highest_number = 0
@@ -127,8 +128,8 @@ def day_time(players, victim, saved):
         # ADD VOTED PLAYER TO VOTE LIST
         for player in players_list:
             if vote == player:
-                players_vote[player] = 1 if player not in players_vote else players_vote[player] + 1
-    
+                players_vote[player] = players_vote.get(vote, 0) + 1 
+
 
     # FIND THE MOST VOTED PLAYER
     highest_number = 0

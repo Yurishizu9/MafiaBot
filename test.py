@@ -1,8 +1,21 @@
-from collections import Counter
+script = open('text.txt')
 
-players = {'alex1': 'civilians', 'matt2': 'civilians', 'rei3': 'civilians', 'virgil4': 'mafia', 'raf5': 'civilians', 'martin6': 'civilians'}
+print(script)
+script = script.read()
+print(script)
+print(len(script))
+print(script[:6])
 
-x = Counter(players.values())
-print(x['mafia'])
 
-print(len(players))
+
+for line in 'speedy fredy':
+    if 'e' in line:
+        # continue skips to the next iteration of the loop 
+        # so 'e' is never printed out to the console
+        continue
+    print(line)
+
+
+
+print(dir(type))
+print(dir(range))
